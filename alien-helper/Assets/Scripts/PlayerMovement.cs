@@ -30,6 +30,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 moveDirection;
     private Rigidbody rb;
 
+    public DeckManager deckManager;
+    public CardManager cardManager;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -125,5 +128,12 @@ public class PlayerMovement : MonoBehaviour
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.linearVelocity = new Vector3(limitedVel.x, rb.linearVelocity.y, limitedVel.z);
         }
+    }
+
+    public void DoubleJump()
+    {
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        cardManager.UpdateHandUI();
     }
 }

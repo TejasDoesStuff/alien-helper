@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class DeckManager : MonoBehaviour
 {
@@ -9,8 +10,11 @@ public class DeckManager : MonoBehaviour
     public List<Card> hand = new List<Card>();
     public int handSize = 5;
     public int currentIndex = 0;
+    public int deckSize = 20;
 
     public CardManager cardManager;
+
+    public TMP_Text deckText;
 
     void Start()
     {
@@ -28,6 +32,8 @@ public class DeckManager : MonoBehaviour
         }
 
         cardManager.UpdateHandUI();
+
+        deckText.text = deck.Count.ToString();
     }
 
     public Card getCard()
@@ -52,7 +58,7 @@ public class DeckManager : MonoBehaviour
 
     public void createDeck()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < deckSize; i++)
         {
             int rand = UnityEngine.Random.Range(0, System.Enum.GetValues(typeof(CardType)).Length);
             CardType type = (CardType)rand;

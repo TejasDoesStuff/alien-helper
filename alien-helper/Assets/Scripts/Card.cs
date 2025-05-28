@@ -18,6 +18,9 @@ public class Card
     public float cooldown = 0f;
     private float lastUsedTime = -Mathf.Infinity;
 
+    public float bulletSpeed = 0f;
+    public int bulletDamage = 0;
+
     public Card(CardType type, int uses = -1, float cooldown = 0f)
     {
         cardType = type;
@@ -27,20 +30,24 @@ public class Card
             case CardType.Shoot:
                 this.uses = 20;
                 this.cooldown = 0.2f;
+                bulletSpeed = 25f;
                 break;
 
             case CardType.Burst:
                 this.uses = 5;
                 this.cooldown = 0.7f;
+                bulletSpeed = 35f;
                 break;
 
             case CardType.DoubleJump:
                 this.uses = 1;
                 this.cooldown = 0f;
                 break;
+
             case CardType.Spin:
                 this.uses = 3;
                 this.cooldown = 1.3f;
+                bulletSpeed = 40f;
                 break;
 
 

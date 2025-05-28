@@ -1,12 +1,14 @@
 using System.Collections;
 using UnityEngine;
 
-public class DamageableObject : MonoBehaviour
+public class EnemyBase : MonoBehaviour
 {
     public int health;
     private Renderer objectRenderer;
     public Color damagedColor = Color.red;
     public Color originalColor = Color.white;
+
+    public GameObject dropPrefab;
 
     void Start()
     {
@@ -15,12 +17,7 @@ public class DamageableObject : MonoBehaviour
         originalColor = objectRenderer.material.color;
     }
 
-    void Update()
-    {
-
-    }
-
-    public void takeDamage(int damage)
+    public virtual void takeDamage(int damage)
     {
         if (health - damage > 0)
         {
@@ -29,8 +26,14 @@ public class DamageableObject : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            Die();
         }
+    }
+
+    protected virtual void Die()
+    {
+        Instantiate(dropPrefab, transform.position, Quaternion.identity);
+        Destroy(gameObject);
     }
 
     private IEnumerator changeColor()

@@ -27,6 +27,7 @@ public class Shooting : MonoBehaviour
     void tryUsing()
     {
         Card selectedCard = deckManager.getCard();
+        projectileSpeed = selectedCard.bulletSpeed;
         if (selectedCard != null)
         {
             if (selectedCard.IsOnCooldown())
@@ -39,10 +40,10 @@ public class Shooting : MonoBehaviour
                 useCard(selectedCard);
                 cardManager.UpdateHandUI();
             }
-            else
+/*            else
             {
                 Debug.Log("Card has no uses left");
-            }
+            }*/
         }
         else
         {
@@ -80,14 +81,20 @@ public class Shooting : MonoBehaviour
         }
         cardManager.UpdateHandUI();
     }
+
     void SpinAttack(float radius, int bulletCount = 8)
     {
         Vector3 center = transform.position;
         float angleStep = 360f / bulletCount;
 
+        Vector3 forward = playerCamera.transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+        float baseAngle = Mathf.Atan2(forward.z, forward.x) * Mathf.Rad2Deg;
+
         for (int i = 0; i < bulletCount; i++)
         {
-            float angle = i * angleStep;
+            float angle = baseAngle + i * angleStep;
             float angleRad = angle * Mathf.Deg2Rad;
             Vector3 offset = new Vector3(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad)) * radius;
             Vector3 spawnPos = center + offset;

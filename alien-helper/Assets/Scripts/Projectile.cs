@@ -15,11 +15,11 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, 3f);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.CompareTag("damage"))
         {
-            collision.gameObject.GetComponent<DamageableObject>().takeDamage(1);
+            collision.gameObject.GetComponent<EnemyBase>().takeDamage(1);
         }
 
         Debug.Log("Hit object: " + collision.gameObject.name + " with tag: " + collision.gameObject.tag);

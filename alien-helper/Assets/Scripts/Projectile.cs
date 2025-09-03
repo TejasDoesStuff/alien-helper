@@ -24,7 +24,7 @@ public class Projectile : MonoBehaviour
 
         Debug.Log("Hit object: " + collision.gameObject.name + " with tag: " + collision.gameObject.tag);
 
-        if (!collision.gameObject.CompareTag("Player") && !collision.gameObject.CompareTag("bullet"))
+        if (!collision.gameObject.CompareTag("Player") && !collision.gameObject.CompareTag("bullet") && !collision.gameObject.CompareTag("Ignore"))
         {
             Destroy(gameObject);
         }

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Threading;
 using UnityEngine;
 
 public class Shooting : MonoBehaviour
@@ -27,90 +26,69 @@ public class Shooting : MonoBehaviour
     void tryUsing()
     {
         Card selectedCard = deckManager.getCard();
-        projectileSpeed = selectedCard.bulletSpeed;
-        if (selectedCard != null)
-        {
-            if (selectedCard.IsOnCooldown())
-            {
-                return;
-            }
-
-            if (selectedCard.use())
-            {
-                useCard(selectedCard);
-                cardManager.UpdateHandUI();
-            }
-/*            else
-            {
-                Debug.Log("Card has no uses left");
-            }*/
-        }
-        else
+        if (selectedCard == null)
         {
             Debug.Log("No valid card selected");
+            return;
+        }
+
+        projectileSpeed = selectedCard.bulletSpeed;
+
+        if (selectedCard.IsOnCooldown()) return;
+
+        if (selectedCard.use())
+        {
+            useCard(selectedCard);
+            cardManager.UpdateHandUI();
         }
     }
 
-    void Shoot()
+    void SpawnProjectile(Vector3 dir, Vector3 spawnPos)
     {
-        Vector3 shootDirection = playerCamera.transform.forward;
-
-        GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation);
-
+        GameObject projectile = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(dir));
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.useGravity = false;
             rb.isKinematic = false;
+            rb.linearVelocity = dir.normalized * projectileSpeed;
         }
 
-        Projectile projectileScript = projectile.GetComponent<Projectile>();
-        if (projectileScript != null)
-        {
-            projectileScript.Init(shootDirection, projectileSpeed);
-        }
-        cardManager.UpdateHandUI();
+        Projectile proj = projectile.GetComponent<Projectile>();
+        if (proj != null)
+            proj.Init(dir, projectileSpeed);
     }
 
-    IEnumerator BurstShot()
+    void Shoot()
     {
-        for (int i = 0; i < 3; i++)
-        {
-            Shoot();
-            yield return new WaitForSeconds(0.1f);
-        }
-        cardManager.UpdateHandUI();
+        Vector3 dir = playerCamera.transform.forward;
+        SpawnProjectile(dir, shootPoint.position);
     }
 
-    void SpinAttack(float radius, int bulletCount = 8)
+    IEnumerator BurstShot(int pelletCount = 5, float spread = 0.05f)
     {
-        Vector3 center = transform.position;
+        for (int i = 0; i < pelletCount; i++)
+        {
+            Vector3 dir = playerCamera.transform.forward;
+            dir += playerCamera.transform.right * Random.Range(-spread, spread);
+            dir += playerCamera.transform.up * Random.Range(-spread, spread);
+            dir.Normalize();
+            SpawnProjectile(dir, shootPoint.position);
+            yield return new WaitForSeconds(0.07f);
+        }
+    }
+
+    void SpinAttack(float radius, int bulletCount = 12)
+    {
         float angleStep = 360f / bulletCount;
-
-        Vector3 forward = playerCamera.transform.forward;
-        forward.y = 0;
-        forward.Normalize();
-        float baseAngle = Mathf.Atan2(forward.z, forward.x) * Mathf.Rad2Deg;
 
         for (int i = 0; i < bulletCount; i++)
         {
-            float angle = baseAngle + i * angleStep;
-            float angleRad = angle * Mathf.Deg2Rad;
-            Vector3 offset = new Vector3(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad)) * radius;
-            Vector3 spawnPos = center + offset;
-
-            GameObject projectile = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(offset));
-
-            Rigidbody rb = projectile.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.useGravity = false;
-                rb.isKinematic = false;
-                rb.linearVelocity = offset.normalized * projectileSpeed;
-            }
+            float angle = i * angleStep * Mathf.Deg2Rad;
+            Vector3 dir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+            Vector3 spawnPos = transform.position + dir * 0.5f;
+            SpawnProjectile(dir, spawnPos);
         }
-
-        cardManager.UpdateHandUI();
     }
 
     void useCard(Card card)
@@ -132,7 +110,6 @@ public class Shooting : MonoBehaviour
             case CardType.Spin:
                 SpinAttack(1.5f);
                 break;
-
         }
     }
 
@@ -143,3 +120,4 @@ public class Shooting : MonoBehaviour
         inputLocked = false;
     }
 }
+
